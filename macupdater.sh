@@ -3,7 +3,7 @@ set -u
 
 #####                                 #####
 ####  ::::::::::::::::::::::::::::::\  ####
-###   ::   MACUPDATER  |  v0.6.2  ::\   ###
+###   ::   MACUPDATER  |  v0.6.3  ::\   ###
 ##    ::  -+-+-+-+-+-+-+-+-+-+-+- ::\    ##
 #     ::  G E O F F  R E P O L I  ::\     #
 ##    ::  github.com/geoffrepoli  ::\    ##
@@ -16,45 +16,45 @@ set -u
 ##  -  C O N F I G U R A T I O N  -
 ##   ----------------------------
 
-# -------------
+# ------------
 #   MAIN OPTIONS
-#    -------------
+#     ------------
 
-# [ 1A ] macOS Policy Trigger
+# :: Installer policy trigger name
 trigger_name="$4"
 
-# [ 1B ] Launch Daemon plist
+# :: Launch Daemon plist filename
 launch_daemon="$5"
 
-# [ 1C ] Installer app explicit path
+# :: Explicit path to installer
 app_path="$6"
 
-#  -------------------
-#    PREINSTALL OPTIONS
-#     -------------------
+#  -----------------
+#    PREINSTALL DIALOG
+#      -----------------
 
-# [ 2A ] Heading to be used for userDialog
+# :: jamfHelper header
 pre_heading="Please wait while we verify your hardware and download the installer."
 
-# [2B ] Title to be used for userDialog
+# :: jamfHelper message text
 pre_description="
 This process will take approximately 5-10 minutes.
 Once completed your computer will reboot. You will be prompted to enter your password to begin the upgrade."
 
-# [ 2C ] Icon to be used for userDialog
+# :: jamfHelper icon
 pre_icon="/System/Library/CoreServices/Software Update.app/Contents/Resources/SoftwareUpdate.icns"
 
-# --------------------
-#   POSTINSTALL OPTIONS
-#    --------------------
+# ------------------
+#   POSTINSTALL DIALOG
+#     ------------------
 
-# [ 3A ] Post-install Heading
+# :: jamfHelper header
 post_heading="Updating configuration settings..."
 
-# [ 3B ] Post-install Description
+# :: jamfHelper message text
 post_description="Your Mac will reboot in a few minutes"
 
-# [ 3C ] Post-install Icon
+# :: jamfHelper icon
 post_icon="/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Sync.icns"
 
 
@@ -63,9 +63,9 @@ post_icon="/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Sync
 #### xxxx #### ++++ ####
 
 
-##   ----------------------------
-##  -  S Y S T E M  C H E C K S  -
-##   ----------------------------
+##   --------------------------------------
+##  -  R E Q U I R E M E N T S  C H E C K  -
+##   --------------------------------------
 
 # Check whether device is on AC or battery
 [[ $(pmset -g ps) =~ "AC Power" ]] && power_adapter=true || power_adapter=false
@@ -96,8 +96,8 @@ if $power_adapter && $space_available; then
     # Insert required postinstall tasks/policies/commands
     runPostinstallTasks()
     {
-        /usr/local/jamf/bin/jamf policy -trigger triggername
-        /usr/sbin/softwareupdate --install --recommended
+        # USER-CONFIGURABLE
+        # <COMMANDS GO HERE>
     }
 
     # Remove the launch daemon with an EXIT trap
@@ -198,7 +198,7 @@ else
 
     /Library/Application\ Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper -windowType utility -icon "$pre_icon" -heading "Requirements Not Met" -description "We are unable to upgrade your Mac at this time. Please ensure you have at least 20 GB of free space available. Additionally, if you are using a MacBook, check that it is connected to power and try again.
 
-    If you continue to experience this issue, please contact the Service Desk." -iconSize 100 -button1 "OK" -defaultButton 1
+    If you continue to experience this issue, please contact the Service Desk." -button1 "OK" -defaultButton 1
 
 fi
 
