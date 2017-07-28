@@ -73,7 +73,7 @@ post_icon="/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Sync
 # Check free space on disk
 [[ $(sw_vers -productVersion | awk -F. '{print $2}') -ge 12 ]] && free_space=$(diskutil info / | grep "Available Space" | awk '{print $4}') || free_space=$(diskutil info / | grep "Free Space" | awk '{print $4}')
 
-[[ ${free_space%.*} -ge 15 ]] && space_available=true || space_available=false
+[[ ${free_space%.*} -ge 20 ]] && space_available=true || space_available=false
 
 
 ##   ---------------------------------------
@@ -184,30 +184,21 @@ PLIST
     chmod 644 /Library/LaunchDaemons/"$launch_daemon"
 
 
-##   -------------------------
-##  -  A P P L I C A T I O N  -
-##   -------------------------
+##   -------------------
+##  -  L A U N C H E R  -
+##   -------------------
 
-
-    # Launch jamfHelper
-    echo "Launching jamfHelper as Utility Window..."
-    "/Library/Application Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper" -windowType fs -icon "$pre_icon" -heading "$pre_heading" -description "$pre_description" -iconSize 100 -lockHUD &
+    /Library/Application\ Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper -windowType fs -icon "$pre_icon" -heading "$pre_heading" -description "$pre_description" -iconSize 100 -lockHUD &
     pid=$!
-
-    # Cache Installer
-    echo "Copying Sierra app to target..."
     /usr/local/jamf/bin/jamf policy -trigger "$trigger_name"
-
-    # Begin Upgrade
-    echo "Launching startosinstall..."
     "$app_path"/Contents/Resources/startosinstall --app_path "$app_path" --nointeraction --pidtosignal "$pid" &
     sleep 3
 
 else
 
-    "/Library/Application Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper" -windowType utility -icon "$pre_icon" -heading "Requirements Not Met" -description "We were unable to prepare your computer for macOS Sierra. Please ensure you are connected to power and that you have at least 15GB of Free Space.
+    /Library/Application\ Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper -windowType utility -icon "$pre_icon" -heading "Requirements Not Met" -description "We are unable to upgrade your Mac at this time. Please ensure you have at least 20 GB of free space available. Additionally, if you are using a MacBook, check that it is connected to power and try again.
 
-    If you continue to experience this issue, please contact the Service Desk" -iconSize 100 -button1 "OK" -defaultButton 1
+    If you continue to experience this issue, please contact the Service Desk." -iconSize 100 -button1 "OK" -defaultButton 1
 
 fi
 
