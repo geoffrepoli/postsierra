@@ -3,7 +3,7 @@ set -u
 
 #####                                 #####
 ####  ::::::::::::::::::::::::::::::\  ####
-###   ::   MACUPDATER  |  v0.6.3  ::\   ###
+###   ::   MACUPDATER  |  v0.6.4  ::\   ###
 ##    ::  -+-+-+-+-+-+-+-+-+-+-+- ::\    ##
 #     ::  G E O F F  R E P O L I  ::\     #
 ##    ::  github.com/geoffrepoli  ::\    ##
@@ -71,13 +71,13 @@ post_icon="/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Sync
 # Get correct jamf binary path
 jamf=$(/usr/bin/which jamf)
 
- if [[ "$jamf" == "" ]] && [[ -e "/usr/sbin/jamf" ]] && [[ ! -e "/usr/local/bin/jamf" ]]; then
+if [[ "$jamf" == "" ]] && [[ -e "/usr/sbin/jamf" ]] && [[ ! -e "/usr/local/bin/jamf" ]]; then
     jamf="/usr/sbin/jamf"
- elif [[ "$jamf" == "" ]] && [[ ! -e "/usr/sbin/jamf" ]] && [[ -e "/usr/local/bin/jamf" ]]; then
+elif [[ "$jamf" == "" ]] && [[ ! -e "/usr/sbin/jamf" ]] && [[ -e "/usr/local/bin/jamf" ]]; then
     jamf="/usr/local/bin/jamf"
- elif [[ "$jamf" == "" ]] && [[ -e "/usr/sbin/jamf" ]] && [[ -e "/usr/local/bin/jamf" ]]; then
+elif [[ "$jamf" == "" ]] && [[ -e "/usr/sbin/jamf" ]] && [[ -e "/usr/local/bin/jamf" ]]; then
     jamf="/usr/local/bin/jamf"
- fi
+fi
 
 # Check whether device is on AC or battery
 [[ $(pmset -g ps) =~ "AC Power" ]] && power_adapter=true || power_adapter=false
