@@ -67,6 +67,18 @@ post_icon="/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Sync
 ##  -  R E Q U I R E M E N T S  C H E C K  -
 ##   --------------------------------------
 
+
+# Get correct jamf binary path
+jamf=$(/usr/bin/which jamf)
+
+ if [[ "$jamf" == "" ]] && [[ -e "/usr/sbin/jamf" ]] && [[ ! -e "/usr/local/bin/jamf" ]]; then
+    jamf="/usr/sbin/jamf"
+ elif [[ "$jamf" == "" ]] && [[ ! -e "/usr/sbin/jamf" ]] && [[ -e "/usr/local/bin/jamf" ]]; then
+    jamf="/usr/local/bin/jamf"
+ elif [[ "$jamf" == "" ]] && [[ -e "/usr/sbin/jamf" ]] && [[ -e "/usr/local/bin/jamf" ]]; then
+    jamf="/usr/local/bin/jamf"
+ fi
+
 # Check whether device is on AC or battery
 [[ $(pmset -g ps) =~ "AC Power" ]] && power_adapter=true || power_adapter=false
 
@@ -134,7 +146,7 @@ if $power_adapter && $space_available; then
         removeInstaller
 
         # Update computer inventory with JSS
-        /usr/local/jamf/bin/jamf recon
+        $jamf recon
 
         # Create completion file
         touch "/var/tmp/.${launch_daemon%.*}.done"
