@@ -3,7 +3,7 @@ set -u
 
 #####                                 #####
 ####  ::::::::::::::::::::::::::::::\  ####
-###   ::   MACUPDATER  |  v0.6.4  ::\   ###
+###   ::   MACUPDATER  |  v0.6.5  ::\   ###
 ##    ::  -+-+-+-+-+-+-+-+-+-+-+- ::\    ##
 #     ::  G E O F F  R E P O L I  ::\     #
 ##    ::  github.com/geoffrepoli  ::\    ##
@@ -173,7 +173,7 @@ POSTINSTALL
 ##   ----------------------------
 
 
-    cat >/Library/launch_daemons/"$launch_daemon" <<-PLIST
+    cat >/Library/LaunchDaemons/"$launch_daemon" <<-PLIST
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
     <plist version="1.0">
