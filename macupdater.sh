@@ -3,7 +3,7 @@ set -u
 
 #####                                 #####
 ####  ::::::::::::::::::::::::::::::\  ####
-###   ::   MACUPDATER  |  v0.6.7  ::\   ###
+###   ::   MACUPDATER  |  v0.6.8  ::\   ###
 ##    ::  -+-+-+-+-+-+-+-+-+-+-+- ::\    ##
 #     ::  G E O F F  R E P O L I  ::\     #
 ##    ::  github.com/geoffrepoli  ::\    ##
@@ -78,12 +78,16 @@ jamf()
 }
 
 # Check whether device is on AC or battery
-[[ $(pmset -g ps) =~ "AC Power" ]] && power_adapter=true || power_adapter=false
+if [[ $(pmset -g ps) =~ "AC Power" ]]
+then power_adapter=true
+else power_adapter=false
+fi
 
 # Check free space on disk
-[[ $(sw_vers -productVersion | awk -F. '{print $2}') -ge 12 ]] && free_space=$(diskutil info / | awk '/Available Space/{print substr($6,2)}') || free_space=$(diskutil info / | awk '/Free Space/{print substr($6,2)}')
-
-(( free_space > 21474836480 )) && space_available=true || space_available=false
+if (( $(diskutil info / | awk '/Available/ || /Free/ && /Space/{print substr($6,2)}') > 21474836480 ))
+then space_available=true
+else space_available=false
+fi
 
 
 ##   ---------------------------------------
