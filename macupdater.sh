@@ -83,9 +83,9 @@ fi
 [[ $(pmset -g ps) =~ "AC Power" ]] && power_adapter=true || power_adapter=false
 
 # Check free space on disk
-[[ $(sw_vers -productVersion | awk -F. '{print $2}') -ge 12 ]] && free_space=$(diskutil info / | grep "Available Space" | awk '{print $4}') || free_space=$(diskutil info / | grep "Free Space" | awk '{print $4}')
+[[ $(sw_vers -productVersion | awk -F. '{print $2}') -ge 12 ]] && free_space=$(diskutil info / | awk '/Available Space/{print substr($6,2)}') || free_space=$(diskutil info / | awk '/Free Space/{print substr($6,2)}')
 
-[[ ${free_space%.*} -ge 20 ]] && space_available=true || space_available=false
+(( free_space > 21474836480 )) && space_available=true || space_available=false
 
 
 ##   ---------------------------------------
