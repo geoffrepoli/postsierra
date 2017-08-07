@@ -3,7 +3,7 @@ set -u
 
 #####                                 #####
 ####  ::::::::::::::::::::::::::::::\  ####
-###   ::   MACUPDATER  |  v0.7.2  ::\   ###
+###   ::   MACUPDATER  |  v0.7.3  ::\   ###
 ##    ::  -+-+-+-+-+-+-+-+-+-+-+- ::\    ##
 #     ::  G E O F F  R E P O L I  ::\     #
 ##    ::  github.com/geoffrepoli  ::\    ##
@@ -57,16 +57,13 @@ post_description="Your Mac will reboot in a few minutes"
 # :: jamfHelper icon
 post_icon="/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Sync.icns"
 
-
 #### xxxx #### ++++ ####
 #### ++++ #### xxxx ####
 #### xxxx #### ++++ ####
 
-
 ##   --------------------------------------
 ##  -  R E Q U I R E M E N T S  C H E C K  -
 ##   --------------------------------------
-
 
 # Get correct jamf binary path
 jamf()
@@ -98,7 +95,6 @@ enoughFreeSpace()
 ##   ---------------------------------------
 ##  -  P O S T - I N S T A L L  S C R I P T  -
 ##   ---------------------------------------
-
 
 if usingPowerAdapter && enoughFreeSpace; then
 
@@ -171,9 +167,8 @@ if usingPowerAdapter && enoughFreeSpace; then
 	exit
 	POSTINSTALL
 
-  chown root:wheel /usr/local/"${launch_daemon%.*}"/postinstall.sh
-  chmod +x /usr/local/"${launch_daemon%.*}"/postinstall.sh
-
+	chown root:wheel /usr/local/"${launch_daemon%.*}"/postinstall.sh
+	chmod +x /usr/local/"${launch_daemon%.*}"/postinstall.sh
 
 ##   ----------------------------
 ##  -  L A U N C H  D A E M O N  -
@@ -200,7 +195,6 @@ if usingPowerAdapter && enoughFreeSpace; then
 
 	chown root:wheel /Library/LaunchDaemons/"$launch_daemon"
 	chmod 644 /Library/LaunchDaemons/"$launch_daemon"
-
 
 ##   -------------------
 ##  -  L A U N C H E R  -
