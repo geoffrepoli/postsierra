@@ -3,7 +3,7 @@ set -u
 
 #####                                 #####
 ####  ::::::::::::::::::::::::::::::\  ####
-###   ::   MACUPDATER  |  v0.7.0  ::\   ###
+###   ::   MACUPDATER  |  v0.7.1  ::\   ###
 ##    ::  -+-+-+-+-+-+-+-+-+-+-+- ::\    ##
 #     ::  G E O F F  R E P O L I  ::\     #
 ##    ::  github.com/geoffrepoli  ::\    ##
@@ -71,27 +71,30 @@ post_icon="/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Sync
 # Get correct jamf binary path
 jamf()
 {
-	if [ -f /usr/local/jamf/bin/jamf ]
-		then /usr/local/jamf/bin/jamf "$@"
-		else /usr/sbin/jamf "$@"
+	if [ -f /usr/local/jamf/bin/jamf ]; then 
+		/usr/local/jamf/bin/jamf "$@"
+	else
+		/usr/sbin/jamf "$@"
 	fi
 }
 
 # Check whether device is on AC or battery
 usingPowerAdapter()
 {
-	if [[ $(pmset -g ps) =~ "AC Power" ]]
-		then return 0
-		else return 1
+	if [[ $(pmset -g ps) =~ "AC Power" ]]; then 
+		return 0
+	else
+		return 1
 	fi
 }
 
 # Check free space on disk
 enoughFreeSpace()
 {
-	if (( $(diskutil info / | awk '/Available/ || /Free/ && /Space/{print substr($6,2)}') > 21474836480 ))
-		then return 0
-		else return 1
+	if (( $(diskutil info / | awk '/Available/ || /Free/ && /Space/{print substr($6,2)}') > 21474836480 )); then
+		return 0
+	else
+		return 1
 	fi
 }
 
@@ -194,7 +197,7 @@ if usingPowerAdapter && enoughFreeSpace; then
   	<array>
   		<string>/usr/local/${launch_daemon%.*}/postinstall.sh</string>
   	</array>
-  </dict>
+	</dict>
 	</plist>
 	PLIST
 
