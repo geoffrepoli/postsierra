@@ -3,7 +3,7 @@ set -u
 
 #####                                 #####
 ####  ::::::::::::::::::::::::::::::\  ####
-###   ::   MACUPDATER  |  v0.7.3  ::\   ###
+###   ::   MACUPDATER  |  v0.7.4  ::\   ###
 ##    ::  -+-+-+-+-+-+-+-+-+-+-+- ::\    ##
 #     ::  G E O F F  R E P O L I  ::\     #
 ##    ::  github.com/geoffrepoli  ::\    ##
@@ -179,16 +179,16 @@ if usingPowerAdapter && enoughFreeSpace; then
 	<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 	<plist version="1.0">
 	<dict>
-  	<key>Label</key>
-  	<string>${launch_daemon%.*}</string>
-  	<key>StartInterval</key>
-  	<integer>10</integer>
-  	<key>RunAtLoad</key>
-  	<true/>
-  	<key>ProgramArguments</key>
-  	<array>
-  		<string>/usr/local/${launch_daemon%.*}/postinstall.sh</string>
-  	</array>
+  		<key>Label</key>
+  		<string>${launch_daemon%.*}</string>
+  		<key>StartInterval</key>
+  		<integer>10</integer>
+  		<key>RunAtLoad</key>
+  		<true/>
+  		<key>ProgramArguments</key>
+  		<array>
+  			<string>/usr/local/${launch_daemon%.*}/postinstall.sh</string>
+  		</array>
 	</dict>
 	</plist>
 	PLIST
