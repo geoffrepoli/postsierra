@@ -3,7 +3,7 @@ set -u
 
 #####                                 #####
 ####  ::::::::::::::::::::::::::::::\  ####
-###   ::    AQUAMATA   |  v0.7.5  ::\   ###
+###   ::    AQUAMATA   |  v0.7.6  ::\   ###
 ##    ::  -+-+-+-+-+-+-+-+-+-+-+- ::\    ##
 #     ::  G E O F F  R E P O L I  ::\     #
 ##    ::    github.com/doggles    ::\    ##
@@ -27,7 +27,7 @@ trigger_name="REPLACE ME"
 launch_daemon="com.doggles.aquamata.plist"
 
 # :: Explicit path to installer
-app_path="/Users/Shared/macos_install.app"
+app_path="/path/to/macos_install.app"
 
 #  -----------------
 #    PREINSTALL DIALOG
