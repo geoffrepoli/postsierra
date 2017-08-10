@@ -3,10 +3,10 @@ set -u
 
 #####                                 #####
 ####  ::::::::::::::::::::::::::::::\  ####
-###   ::   MACUPDATER  |  v0.7.4  ::\   ###
+###   ::    AQUAMATA   |  v0.7.5  ::\   ###
 ##    ::  -+-+-+-+-+-+-+-+-+-+-+- ::\    ##
 #     ::  G E O F F  R E P O L I  ::\     #
-##    ::  github.com/geoffrepoli  ::\    ##
+##    ::    github.com/doggles    ::\    ##
 ###   ::::::::::::::::::::::::::::::\   ###
 ####  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\  ####
 #####                                 #####
@@ -21,13 +21,13 @@ set -u
 #     ------------
 
 # :: Installer policy trigger name
-trigger_name="$4"
+trigger_name="REPLACE ME"
 
 # :: Launch Daemon plist filename
-launch_daemon="$5"
+launch_daemon="com.doggles.aquamata.plist"
 
 # :: Explicit path to installer
-app_path="$6"
+app_path="/Users/Shared/macos_install.app"
 
 #  -----------------
 #    PREINSTALL DIALOG
@@ -99,7 +99,7 @@ enoughFreeSpace()
 if usingPowerAdapter && enoughFreeSpace; then
 
 	mkdir /usr/local/"${launch_daemon%.*}"
-	cat >/usr/local/"${launch_daemon%.*}"/postinstall.sh <<-POSTINSTALL
+	cat > /usr/local/"${launch_daemon%.*}"/postinstall.sh <<-POSTINSTALL
 	#!/usr/bin/env bash
 
 	# Check if Finder is running, signaling user is logged in
