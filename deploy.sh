@@ -131,7 +131,8 @@ if usingPowerAdapter && enoughFreeSpace; then
 	# Truncate jamfHelper path
 	jamfHelper()
 	{
-		/Library/Application\ Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper "$@"
+		u=$(/usr/bin/python -c 'from SystemConfiguration import SCDynamicStoreCopyConsoleUser; import sys; username = (SCDynamicStoreCopyConsoleUser(None, None, None) or [None])[0]; username = [username,""][username in [u"loginwindow", None, u""]]; sys.stdout.write(username + "\n");')
+		sudo -u "$u" /Library/Application\ Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper "$@"
 	}
 
 	# Get correct jamf binary path
