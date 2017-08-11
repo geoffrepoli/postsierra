@@ -5,7 +5,7 @@ IDENTIFIER=com.doggles.$PROJECT
 
 #####                                 #####
 ####  ::::::::::::::::::::::::::::::\  ####
-###   ::    AQUAMATA   |  v0.8.0  ::\   ###
+###   ::    AQUAMATA   |  v0.8.1  ::\   ###
 ##    ::  -+-+-+-+-+-+-+-+-+-+-+- ::\    ##
 #     ::  G E O F F  R E P O L I  ::\     #
 ##    ::    github.com/doggles    ::\    ##
@@ -224,7 +224,7 @@ if usingPowerAdapter && enoughFreeSpace; then
 	pid=$!
 	jamf policy -trigger "$TRIGGER"
 	"$INSTALLER"/Contents/Resources/startosinstall \
-		--INSTALLER "$INSTALLER" \
+		--applicationpath "$INSTALLER" \
 		--nointeraction \
 		--pidtosignal $pid &
 	sleep 3
