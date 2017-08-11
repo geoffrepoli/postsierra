@@ -3,7 +3,7 @@ set -u
 
 #####                                 #####
 ####  ::::::::::::::::::::::::::::::\  ####
-###   ::    AQUAMATA   |  v0.7.6  ::\   ###
+###   ::    AQUAMATA   |  v0.7.7  ::\   ###
 ##    ::  -+-+-+-+-+-+-+-+-+-+-+- ::\    ##
 #     ::  G E O F F  R E P O L I  ::\     #
 ##    ::    github.com/doggles    ::\    ##
@@ -102,6 +102,15 @@ if usingPowerAdapter && enoughFreeSpace; then
 	cat > /usr/local/"${launch_daemon%.*}"/postinstall.sh <<-POSTINSTALL
 	#!/usr/bin/env bash
 
+	# Get correct jamf binary path
+	jamf()
+	{
+		if [ -f /usr/local/jamf/bin/jamf ]
+		then /usr/local/jamf/bin/jamf "$@"
+		else /usr/sbin/jamf "$@"
+		fi
+	}
+
 	# Check if Finder is running, signaling user is logged in
 	userLoggedIn()
 	{
@@ -174,7 +183,7 @@ if usingPowerAdapter && enoughFreeSpace; then
 ##  -  L A U N C H  D A E M O N  -
 ##   ----------------------------
 
-	cat >/Library/LaunchDaemons/"$launch_daemon" <<-PLIST
+	cat > /Library/LaunchDaemons/"$launch_daemon" <<-PLIST
 	<?xml version="1.0" encoding="UTF-8"?>
 	<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 	<plist version="1.0">
@@ -201,8 +210,8 @@ if usingPowerAdapter && enoughFreeSpace; then
 ##   -------------------
 
 	/Library/Application\ Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper -windowType fs -icon "$pre_icon" -heading "$pre_heading" -description "$pre_description" -iconSize 100 -lockHUD &
-    pid=$!
-	/usr/local/jamf/bin/jamf policy -trigger "$trigger_name"
+	pid=$!
+	jamf policy -trigger "$trigger_name"
 	"$app_path"/Contents/Resources/startosinstall --app_path "$app_path" --nointeraction --pidtosignal "$pid" &
 	sleep 3
 
