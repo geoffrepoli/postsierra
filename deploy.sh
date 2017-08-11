@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 set -u
+PROJECT=aquamata
+IDENTIFIER=com.doggles.$PROJECT
 
 #####                                 #####
 ####  ::::::::::::::::::::::::::::::\  ####
-###   ::    AQUAMATA   |  v0.7.9  ::\   ###
+###   ::    AQUAMATA   |  v0.8.0  ::\   ###
 ##    ::  -+-+-+-+-+-+-+-+-+-+-+- ::\    ##
 #     ::  G E O F F  R E P O L I  ::\     #
 ##    ::    github.com/doggles    ::\    ##
@@ -16,18 +18,17 @@ set -u
 ##  -  C O N F I G U R A T I O N  -
 ##   ----------------------------
 
-# ------------
-#   MAIN OPTIONS
-#     ------------
+# ---------------
+#   JAMF PARAMETERS
+#     ---------------
 
 # :: Installer policy trigger name
-trigger_name="update-os"
-
-# :: Launch Daemon plist filename
-launch_daemon="com.doggles.aquamata.plist"
+# Add to Parameter 4 in Jamf Script editor
+TRIGGER="$4"
 
 # :: Explicit path to installer
-app_path="/Users/Shared/macos_installer.app"
+# Add to Parameter 5 in Jamf Script editor
+INSTALLER="$5"
 
 #  -----------------
 #    PREINSTALL DIALOG
@@ -115,8 +116,8 @@ enoughFreeSpace()
 
 if usingPowerAdapter && enoughFreeSpace; then
 
-	mkdir /usr/local/"${launch_daemon%.*}"
-	cat > /usr/local/"${launch_daemon%.*}"/postinstall.sh <<-POSTINSTALL
+	mkdir /usr/local/$PROJECT
+	cat > /usr/local/$PROJECT/postinstall.sh <<-POSTINSTALL
 	#!/usr/bin/env bash
 
 	# Insert required postinstall tasks/policies/commands
@@ -147,76 +148,67 @@ if usingPowerAdapter && enoughFreeSpace; then
 		pgrep Finder && return 0 || return 1
 	}
 
-	# Remove the launch daemon with an EXIT trap
+	# Unload daemon and remove all associated files
 	removeDaemon()
 	{
-		rm -f /Library/LaunchDaemons/"${launch_daemon:?}"
-		launchctl unload -w /Library/LaunchDaemons/"$launch_daemon"
+		rm -rf "$INSTALLER"
+		rm -rf /usr/local/$PROJECT
+		rm -f /Library/LaunchDaemons/$IDENTIFIER.plist
+		launchctl unload -w /Library/LaunchDaemons/$IDENTIFIER.plist
 	}
 
-	# Remove macOS Installer and postinstall directory
-	removeInstaller()
+	# run removeDaemon() + Reboot
+	cleanup()
 	{
-		local launch_daemon="${launch_daemon%.*}"
-		rm -rf "$app_path"
-		rm -rf /usr/local/"${launch_daemon:?}"
-	}
-
-	# Preemptive double-check to prevent daemon from looping
-	# if computer is shutdown before daemon is removed
-	cleanupFiles()
-	{
-		removeInstaller
 		removeDaemon
+		shutdown -r now
 	}
 
-	if userLoggedIn && [ ! -f /var/tmp/."${launch_daemon%.*}".done ]; then
-		jamfHelper \\																# Launch jamfHelper curtain
+	if userLoggedIn && [ ! -f /var/tmp/${PROJECT}_done ]; then
+		jamfHelper \\															# Launch jamfHelper curtain
 			-windowType fs \\
 			-heading "$post_heading" \\
 			-description "$post_description" \\
 			-icon "$post_icon" \\
 			-lockHUD &
-		postinstallItems														# Start postinstall workflow
-		removeInstaller															# Remove macOS installer app
-		jamf recon																	# Update computer inventory with JSS
-		touch /var/tmp/."${launch_daemon%.*}".done	# Create completion file
-		trap 'removeDaemon' EXIT										# Remove launch daemon on script exit and reboot
-		shutdown -r now
-	elif [ -f /var/tmp/."${launch_daemon%.*}".done ]; then
-		cleanupFiles
+		postinstallItems													# Start postinstall workflow
+		jamf recon																# Update computer inventory with JSS
+		touch /var/tmp/${PROJECT}_done						# Create completion file
+		trap 'cleanup' EXIT												# Remove launch daemon on script exit and reboot
+	elif [ -f /var/tmp/${PROJECT}_done ]; then
+		trap 'removeDaemon' EXIT									# Remove daemon and install files, no reboot
 	fi
 	exit
 	POSTINSTALL
 
-	chown root:wheel /usr/local/"${launch_daemon%.*}"/postinstall.sh
-	chmod +x /usr/local/"${launch_daemon%.*}"/postinstall.sh
+	chown root:wheel /usr/local/$PROJECT/postinstall.sh
+	chmod +x /usr/local/$PROJECT/postinstall.sh
 
 ##   ----------------------------
 ##  -  L A U N C H  D A E M O N  -
 ##   ----------------------------
 
-	cat > /Library/LaunchDaemons/"$launch_daemon" <<-PLIST
+	cat > /Library/LaunchDaemons/$IDENTIFIER.plist <<-PLIST
 	<?xml version="1.0" encoding="UTF-8"?>
 	<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 	<plist version="1.0">
 	<dict>
   		<key>Label</key>
-  		<string>${launch_daemon%.*}</string>
+  		<string>$IDENTIFIER</string>
   		<key>StartInterval</key>
   		<integer>10</integer>
   		<key>RunAtLoad</key>
   		<true/>
   		<key>ProgramArguments</key>
   		<array>
-  			<string>/usr/local/${launch_daemon%.*}/postinstall.sh</string>
+  			<string>/usr/local/$PROJECT/postinstall.sh</string>
   		</array>
 	</dict>
 	</plist>
 	PLIST
 
-	chown root:wheel /Library/LaunchDaemons/"$launch_daemon"
-	chmod 644 /Library/LaunchDaemons/"$launch_daemon"
+	chown root:wheel /Library/LaunchDaemons/$IDENTIFIER.plist
+	chmod 644 /Library/LaunchDaemons/$IDENTIFIER.plist
 
 ##   -------------------
 ##  -  L A U N C H E R  -
@@ -230,9 +222,9 @@ if usingPowerAdapter && enoughFreeSpace; then
 		-iconSize 100 \
 		-lockHUD &
 	pid=$!
-	jamf policy -trigger "$trigger_name"
-	"$app_path"/Contents/Resources/startosinstall \
-		--app_path "$app_path" \
+	jamf policy -trigger "$TRIGGER"
+	"$INSTALLER"/Contents/Resources/startosinstall \
+		--INSTALLER "$INSTALLER" \
 		--nointeraction \
 		--pidtosignal $pid &
 	sleep 3
