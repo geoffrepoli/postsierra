@@ -3,7 +3,7 @@ set -u
 
 #####                                 #####
 ####  ::::::::::::::::::::::::::::::\  ####
-###   ::    AQUAMATA   |  v0.7.7  ::\   ###
+###   ::    AQUAMATA   |  v0.7.8  ::\   ###
 ##    ::  -+-+-+-+-+-+-+-+-+-+-+- ::\    ##
 #     ::  G E O F F  R E P O L I  ::\     #
 ##    ::    github.com/doggles    ::\    ##
@@ -21,13 +21,13 @@ set -u
 #     ------------
 
 # :: Installer policy trigger name
-trigger_name="REPLACE ME"
+trigger_name="update-os"
 
 # :: Launch Daemon plist filename
 launch_daemon="com.doggles.aquamata.plist"
 
 # :: Explicit path to installer
-app_path="/path/to/macos_install.app"
+app_path="/Users/Shared/macos_installer.app"
 
 #  -----------------
 #    PREINSTALL DIALOG
@@ -37,9 +37,7 @@ app_path="/path/to/macos_install.app"
 pre_heading="Please wait while we verify your hardware and download the installer."
 
 # :: jamfHelper message text
-pre_description="
-This process will take approximately 5-10 minutes.
-Once completed your computer will reboot. You will be prompted to enter your password to begin the upgrade."
+pre_description="This process will take approximately 5-10 minutes. Once completed your computer will reboot. You will be prompted to enter your password to begin the upgrade."
 
 # :: jamfHelper icon
 pre_icon="/System/Library/CoreServices/Software Update.app/Contents/Resources/SoftwareUpdate.icns"
@@ -49,13 +47,26 @@ pre_icon="/System/Library/CoreServices/Software Update.app/Contents/Resources/So
 #     ------------------
 
 # :: jamfHelper header
-post_heading="Updating configuration settings..."
+post_heading="Updating configuration settings"
 
 # :: jamfHelper message text
 post_description="Your Mac will reboot in a few minutes"
 
 # :: jamfHelper icon
 post_icon="/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Sync.icns"
+
+# --------------
+#   FAILURE DIALOG
+#     --------------
+
+# :: jamfHelper header
+fail_heading="Requirements Not Met"
+
+# :: jamfHelper message text
+fail_description="We are unable to upgrade your Mac at this time. Please ensure you have at least 20 GB of free space available. Additionally, if you are using a MacBook, check that it is connected to power and try again. If you continue to experience this issue, please contact the help desk."
+
+# :: jamfHelper icon
+fail_icon="/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertNoteIcon.icns"
 
 #### xxxx #### ++++ ####
 #### ++++ #### xxxx ####
@@ -64,6 +75,13 @@ post_icon="/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Sync
 ##   --------------------------------------
 ##  -  R E Q U I R E M E N T S  C H E C K  -
 ##   --------------------------------------
+
+# Truncate jamfHelper path
+jamfHelper()
+{
+	[ -f /Library/Application\ Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper ] &&
+	/Library/Application\ Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper "$@"
+}
 
 # Get correct jamf binary path
 jamf()
@@ -102,6 +120,20 @@ if usingPowerAdapter && enoughFreeSpace; then
 	cat > /usr/local/"${launch_daemon%.*}"/postinstall.sh <<-POSTINSTALL
 	#!/usr/bin/env bash
 
+	# Insert required postinstall tasks/policies/commands
+	postinstallItems()
+	{
+		# USER-CONFIGURABLE
+		# COMMANDS GO HERE
+	}
+
+	# Truncate jamfHelper path
+	jamfHelper()
+	{
+		[ -f /Library/Application\ Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper ] &&
+		/Library/Application\ Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper "$@"
+	}
+
 	# Get correct jamf binary path
 	jamf()
 	{
@@ -117,18 +149,11 @@ if usingPowerAdapter && enoughFreeSpace; then
 		pgrep Finder && return 0 || return 1
 	}
 
-	# Insert required postinstall tasks/policies/commands
-	runPostinstallTasks()
-	{
-		# USER-CONFIGURABLE
-		# <COMMANDS GO HERE>
-	}
-
 	# Remove the launch daemon with an EXIT trap
 	removeDaemon()
 	{
-		rm -f "/Library/LaunchDaemons/${launch_daemon:?}"
-		launchctl unload "/Library/LaunchDaemons/$launch_daemon"
+		rm -f /Library/LaunchDaemons/"${launch_daemon:?}"
+		launchctl unload -w /Library/LaunchDaemons/"$launch_daemon"
 	}
 
 	# Remove macOS Installer and postinstall directory
@@ -136,43 +161,33 @@ if usingPowerAdapter && enoughFreeSpace; then
 	{
 		local launch_daemon="${launch_daemon%.*}"
 		rm -rf "$app_path"
-		rm -rf "/usr/local/${launch_daemon:?}"
+		rm -rf /usr/local/"${launch_daemon:?}"
 	}
 
-	# Preemptive double-check to prevent daemon from looping if computer is shutdown before daemon is removed
-	postinstallCleanup()
+	# Preemptive double-check to prevent daemon from looping
+	# if computer is shutdown before daemon is removed
+	cleanupFiles()
 	{
 		removeInstaller
 		removeDaemon
 	}
 
-	if userLoggedIn && [[ ! -f "/var/tmp/.${launch_daemon%.*}.done" ]]; then
-
-		# Launch jamfHelper curtain
-		"/Library/Application Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper" -windowType fs -heading "$post_heading" -description "$post_description" -icon "$post_icon" -lockHUD &
-
-		# Start postinstall workflow
-		runPostinstallTasks
-
-		# Remove macOS installer app
-		removeInstaller
-
-		# Update computer inventory with JSS
-		jamf recon
-
-		# Create completion file
-		touch "/var/tmp/.${launch_daemon%.*}.done"
-
-		# Remove launch daemon on script exit and then reboot immediately
-		trap 'removeDaemon' EXIT
+	if userLoggedIn && [ ! -f /var/tmp/."${launch_daemon%.*}".done ]; then
+		jamfHelper \\																# Launch jamfHelper curtain
+			-windowType fs \\
+			-heading "$post_heading" \\
+			-description "$post_description" \\
+			-icon "$post_icon" \\
+			-lockHUD &
+		postinstallItems														# Start postinstall workflow
+		removeInstaller															# Remove macOS installer app
+		jamf recon																	# Update computer inventory with JSS
+		touch /var/tmp/."${launch_daemon%.*}".done	# Create completion file
+		trap 'removeDaemon' EXIT										# Remove launch daemon on script exit and reboot
 		shutdown -r now
-
-	elif [[ -f "/var/tmp/.${launch_daemon%.*}.done" ]]; then
-
-		postinstallCleanup
-
+	elif [ -f /var/tmp/."${launch_daemon%.*}".done ]; then
+		cleanupFiles
 	fi
-
 	exit
 	POSTINSTALL
 
@@ -209,17 +224,30 @@ if usingPowerAdapter && enoughFreeSpace; then
 ##  -  L A U N C H E R  -
 ##   -------------------
 
-	/Library/Application\ Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper -windowType fs -icon "$pre_icon" -heading "$pre_heading" -description "$pre_description" -iconSize 100 -lockHUD &
+	jamfHelper \
+		-windowType fs \
+		-icon "$pre_icon" \
+		-heading "$pre_heading" \
+		-description "$pre_description" \
+		-iconSize 100 \
+		-lockHUD &
 	pid=$!
 	jamf policy -trigger "$trigger_name"
-	"$app_path"/Contents/Resources/startosinstall --app_path "$app_path" --nointeraction --pidtosignal "$pid" &
+	"$app_path"/Contents/Resources/startosinstall \
+		--app_path "$app_path" \
+		--nointeraction \
+		--pidtosignal $pid &
 	sleep 3
 
 else
 
-	/Library/Application\ Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper -windowType utility -icon "$pre_icon" -heading "Requirements Not Met" -description "We are unable to upgrade your Mac at this time. Please ensure you have at least 20 GB of free space available. Additionally, if you are using a MacBook, check that it is connected to power and try again.
-
-	If you continue to experience this issue, please contact the Service Desk." -button1 "OK" -defaultButton 1
+	jamfHelper \
+		-windowType utility \
+		-icon "$fail_icon" \
+		-heading "$fail_heading" \
+		-description "$fail_description" \
+		-button1 "OK" \
+		-defaultButton 1
 
 fi
 
