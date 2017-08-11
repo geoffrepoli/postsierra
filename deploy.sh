@@ -3,7 +3,7 @@ set -u
 
 #####                                 #####
 ####  ::::::::::::::::::::::::::::::\  ####
-###   ::    AQUAMATA   |  v0.7.8  ::\   ###
+###   ::    AQUAMATA   |  v0.7.9  ::\   ###
 ##    ::  -+-+-+-+-+-+-+-+-+-+-+- ::\    ##
 #     ::  G E O F F  R E P O L I  ::\     #
 ##    ::    github.com/doggles    ::\    ##
@@ -79,7 +79,6 @@ fail_icon="/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Aler
 # Truncate jamfHelper path
 jamfHelper()
 {
-	[ -f /Library/Application\ Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper ] &&
 	/Library/Application\ Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper "$@"
 }
 
@@ -130,7 +129,6 @@ if usingPowerAdapter && enoughFreeSpace; then
 	# Truncate jamfHelper path
 	jamfHelper()
 	{
-		[ -f /Library/Application\ Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper ] &&
 		/Library/Application\ Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper "$@"
 	}
 
