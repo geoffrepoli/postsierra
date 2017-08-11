@@ -5,7 +5,7 @@ IDENTIFIER=com.doggles.$PROJECT
 
 #####                                 #####
 ####  ::::::::::::::::::::::::::::::\  ####
-###   ::    AQUAMATA   |  v0.8.1  ::\   ###
+###   ::    AQUAMATA   |  v0.8.2  ::\   ###
 ##    ::  -+-+-+-+-+-+-+-+-+-+-+- ::\    ##
 #     ::  G E O F F  R E P O L I  ::\     #
 ##    ::    github.com/doggles    ::\    ##
@@ -165,18 +165,18 @@ if usingPowerAdapter && enoughFreeSpace; then
 	}
 
 	if userLoggedIn && [ ! -f /var/tmp/${PROJECT}_done ]; then
-		jamfHelper \\															# Launch jamfHelper curtain
+		jamfHelper \\					# Launch jamfHelper curtain
 			-windowType fs \\
 			-heading "$post_heading" \\
 			-description "$post_description" \\
 			-icon "$post_icon" \\
 			-lockHUD &
-		postinstallItems													# Start postinstall workflow
-		jamf recon																# Update computer inventory with JSS
-		touch /var/tmp/${PROJECT}_done						# Create completion file
-		trap 'cleanup' EXIT												# Remove launch daemon on script exit and reboot
+		postinstallItems				# Start postinstall workflow
+		jamf recon					# Update computer inventory in JSS
+		touch /var/tmp/${PROJECT}_done			# Create completion file
+		trap 'cleanup' EXIT				# Remove launch daemon on script exit and reboot
 	elif [ -f /var/tmp/${PROJECT}_done ]; then
-		trap 'removeDaemon' EXIT									# Remove daemon and install files, no reboot
+		trap 'removeDaemon' EXIT			# Remove daemon and install files, no reboot
 	fi
 	exit
 	POSTINSTALL
