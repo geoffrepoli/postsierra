@@ -5,7 +5,7 @@ IDENTIFIER=com.doggles.$PROJECT
 
 #####                                 #####
 ####  ::::::::::::::::::::::::::::::\  ####
-###   ::    AQUAMATA   |  v0.8.2  ::\   ###
+###   ::    AQUAMATA   |  v0.8.3  ::\   ###
 ##    ::  -+-+-+-+-+-+-+-+-+-+-+- ::\    ##
 #     ::  G E O F F  R E P O L I  ::\     #
 ##    ::    github.com/doggles    ::\    ##
@@ -80,7 +80,8 @@ fail_icon="/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/Aler
 # Truncate jamfHelper path
 jamfHelper()
 {
-	/Library/Application\ Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper "$@"
+	u=$(/usr/bin/python -c 'from SystemConfiguration import SCDynamicStoreCopyConsoleUser; import sys; username = (SCDynamicStoreCopyConsoleUser(None, None, None) or [None])[0]; username = [username,""][username in [u"loginwindow", None, u""]]; sys.stdout.write(username + "\n");')
+	sudo -u "$u" /Library/Application\ Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper "$@"
 }
 
 # Get correct jamf binary path
