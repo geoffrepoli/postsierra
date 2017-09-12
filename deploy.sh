@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-set -u
+
 PROJECT=aquamata
 IDENTIFIER=com.doggles.$PROJECT
 
 #####                                 #####
 ####  ::::::::::::::::::::::::::::::\  ####
-###   ::    AQUAMATA   |  v0.8.3  ::\   ###
+###   ::    AQUAMATA   |  v0.8.4  ::\   ###
 ##    ::  -+-+-+-+-+-+-+-+-+-+-+- ::\    ##
 #     ::  G E O F F  R E P O L I  ::\     #
 ##    ::    github.com/doggles    ::\    ##
@@ -131,16 +131,16 @@ if usingPowerAdapter && enoughFreeSpace; then
 	# Truncate jamfHelper path
 	jamfHelper()
 	{
-		u=$(/usr/bin/python -c 'from SystemConfiguration import SCDynamicStoreCopyConsoleUser; import sys; username = (SCDynamicStoreCopyConsoleUser(None, None, None) or [None])[0]; username = [username,""][username in [u"loginwindow", None, u""]]; sys.stdout.write(username + "\n");')
-		sudo -u "$u" /Library/Application\ Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper "$@"
+		u=\$(/usr/bin/python -c 'from SystemConfiguration import SCDynamicStoreCopyConsoleUser; import sys; username = (SCDynamicStoreCopyConsoleUser(None, None, None) or [None])[0]; username = [username,""][username in [u"loginwindow", None, u""]]; sys.stdout.write(username + "\n");')
+		sudo -u "\$u" /Library/Application\ Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper "\$@"
 	}
 
 	# Get correct jamf binary path
 	jamf()
 	{
 		if [ -f /usr/local/jamf/bin/jamf ]
-		then /usr/local/jamf/bin/jamf "$@"
-		else /usr/sbin/jamf "$@"
+		then /usr/local/jamf/bin/jamf "\$@"
+		else /usr/sbin/jamf "\$@"
 		fi
 	}
 
