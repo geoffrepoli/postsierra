@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-PROJECT=aquamata
+PROJECT=postsierra
 IDENTIFIER=com.doggles.$PROJECT
 
 #####                                 #####
 ####  ::::::::::::::::::::::::::::::\  ####
-###   ::    AQUAMATA   |  v0.8.4  ::\   ###
+###   ::   POSTSIERRA  |  v0.8.5  ::\   ###
 ##    ::  -+-+-+-+-+-+-+-+-+-+-+- ::\    ##
 #     ::  G E O F F  R E P O L I  ::\     #
 ##    ::    github.com/doggles    ::\    ##

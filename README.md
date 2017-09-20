@@ -1,4 +1,4 @@
-# AQUAMATA
+# POST-SIERRA
 
 A post-10.12.4 macOS Sierra upgrade & post-install workflow, specifically designed for Jamf Pro deployment. Allows you to add additional scripts or installations after the Mac has finished upgrading when the user first logs in.
 
@@ -10,7 +10,7 @@ Note that this is very much a work in progress and I have not yet gotten around 
 
 Clone the repository
 ```
-git clone https://github.com/doggles/aquamata.git
+git clone https://github.com/doggles/postsierra.git
 ```
 
 ## License
