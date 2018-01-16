@@ -10,7 +10,7 @@ Note that this is very much a work in progress and I have not yet gotten around 
 
 Clone the repository
 ```
-git clone https://github.com/doggles/postsierra.git
+git clone https://github.com/geoffrepoli/postsierra.git
 ```
 
 ## License
